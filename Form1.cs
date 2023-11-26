@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 
@@ -11,11 +12,9 @@ namespace WinBreakBricks
         Ball ball;
         Scenary scenary;
 
-        Image padImage;
+        List<Image> padImages;
         Image ballImage;
-        Image brickBlueImage;
-        Image brickGreenImage;
-        Image brickPurpleImage;
+        List<Image> brickImages;
 
         Point padSize;
         Point ballSize;
@@ -25,6 +24,12 @@ namespace WinBreakBricks
         public Form1()
         {
             InitializeComponent();
+
+            // This property determines whether the form receives keyboard events before the event is passed to the control that has focus.
+            KeyPreview = true;
+
+            // Set focus to the form
+            this.Focus();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -45,18 +50,44 @@ namespace WinBreakBricks
             Image spriteImage; //all the images are inside this sprite image
             spriteImage = Image.FromFile(spritePath); //all the images are inside this sprite image
 
-            padSize = new Point(155, 45);
+            padSize = new Point(150, 40);
             ballSize = new Point(75, 75);
             brickSize = new Point(170, 60);
             scenarySize = new Point(1190, 600);
 
             // Load individual images into variables
             // Call the method to copy a portion of the source image to the destination image
-            padImage = CopyImagePortion(new Rectangle(395, 15, padSize.X, padSize.Y), spriteImage); //the pad (1st animation) is in 390,10 size 160,50
+            padImages = new List<Image>();
+            Image padImage = CopyImagePortion(new Rectangle(398, 17, padSize.X, padSize.Y), spriteImage); //the pad (1st animation) is in 390,10 size 160,50
+            padImages.Add(padImage);
+            padImage = CopyImagePortion(new Rectangle(566, 17, padSize.X, padSize.Y), spriteImage); //the pad (2st animation) is in 390,10 size 160,50
+            padImages.Add(padImage);
+            padImage = CopyImagePortion(new Rectangle(738, 17, padSize.X, padSize.Y), spriteImage); //the pad (3st animation) is in 390,10 size 160,50
+            padImages.Add(padImage);
+
             ballImage = CopyImagePortion(new Rectangle(805, 548, ballSize.X, ballSize.Y), spriteImage); //the pad (1st animation) is in 390,10 size 160,50
-            brickBlueImage = CopyImagePortion(new Rectangle(20, 18, brickSize.X, brickSize.Y), spriteImage); //the brick (blue) is in 16,16 size 175,60
-            brickGreenImage = CopyImagePortion(new Rectangle(20, 94, brickSize.X, brickSize.Y), spriteImage); //the brick (blue) is in 16,16 size 175,60
-            brickPurpleImage = CopyImagePortion(new Rectangle(20, 169, brickSize.X, brickSize.Y), spriteImage); //the brick (blue) is in 16,16 size 175,60
+
+            brickImages = new List<Image>();
+            Image brickImage = CopyImagePortion(new Rectangle(20, 18, brickSize.X, brickSize.Y), spriteImage); //the brick (blue) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 94, brickSize.X, brickSize.Y), spriteImage); //the brick (green) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 169, brickSize.X, brickSize.Y), spriteImage); //the brick (purple) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 241, brickSize.X, brickSize.Y), spriteImage); //the brick (red) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 319, brickSize.X, brickSize.Y), spriteImage); //the brick (orange) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 394, brickSize.X, brickSize.Y), spriteImage); //the brick (sky) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 470, brickSize.X, brickSize.Y), spriteImage); //the brick (yellow) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 548, brickSize.X, brickSize.Y), spriteImage); //the brick (dark green) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 622, brickSize.X, brickSize.Y), spriteImage); //the brick (grey) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
+            brickImage = CopyImagePortion(new Rectangle(20, 697, brickSize.X, brickSize.Y), spriteImage); //the brick (brown) is in 16,16 size 175,60
+            brickImages.Add(brickImage);
 
 
             //classes
@@ -66,8 +97,8 @@ namespace WinBreakBricks
             ball = new Ball(centerX - ballSize.X / 2, 440, ballSize);
             scenary = new Scenary(scenarySize);
 
-            //stage scenary
-            InicializateScenary(1);
+            //stage 1 of scenary
+            scenary.Initialize(brickSize);
 
 
             //start the game
@@ -75,32 +106,14 @@ namespace WinBreakBricks
             timer.Enabled = true;
         }
 
-        private void InicializateScenary(int stage)
+        private void InitializeBallPad()
         {
-            switch (stage)
-            {
-                case 1:
-                    //stage 1 scenary
-                    //7 columns and 3 rows
-                    ColorBrick color = ColorBrick.Blue;
-                    for (int y = 0; y < 3; y++)
-                    {
-                        if (y == 0)
-                            color = ColorBrick.Blue;
-                        else if (y == 1)
-                            color = ColorBrick.Green;
-                        else if (y == 2)
-                            color = ColorBrick.Purple;
-                        for (int x = 0; x < 7; x++)
-                        {
-                            scenary.bricks.Add(new Brick(new Point(x * brickSize.X, y * brickSize.Y), color));
-                        }
-                    }
-                    break;
-                case 2:
-                    //stage 1 scenary
-                    break;
-            }
+            int centerX = scenary.boundariesDownRight.X / 2;
+            int centery = scenary.boundariesDownRight.Y / 2;
+            pad.location = new Point(centerX - padSize.X / 2, 540);
+            ball.locationX = centerX - ballSize.X / 2;
+            ball.locationY = 440;
+            ball.direction = Vector.NormalizeVector(new Vector2(1, -1)); //to diagonal North East
         }
 
         private Image CopyImagePortion(Rectangle sourceRectangle, Image sourceImage)
@@ -141,28 +154,33 @@ namespace WinBreakBricks
 
         private void UpdateBall()
         {
-            ball.Move(scenary);
+            ball.Move(scenary, pad);
         }
 
         private void DragGame()
         {
             Bitmap bitmap = new Bitmap(pcbGraphics.Width, pcbGraphics.Height);
-            Graphics g = Graphics.FromImage(bitmap);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
 
-            // Clear the background
-            g.Clear(Color.Black);
+                // Clear the background
+                g.Clear(Color.Black);
 
-            // draw scenary
-            DrawBricks(g);
+                // draw scenary
+                DrawBricks(g);
 
-            // draw ball
-            DrawBall(g);
+                // draw ball
+                DrawBall(g);
 
-            // draw the pad of the player
-            DrawPad(g);
+                // draw the pad of the player
+                DrawPad(g);
 
-            // Draw the game over if you not alive
-            DrawGameOver(g);
+                // Draw the game over if you not alive or win
+                DrawGameOver(g);
+
+                // Draw score and stage
+                DrawLabels();
+            }
 
             // Draw the off-screen bitmap to the PictureBox
             pcbGraphics.Image?.Dispose(); // Dispose the previous image to avoid memory leaks
@@ -171,7 +189,17 @@ namespace WinBreakBricks
 
         private void DrawPad(Graphics g)
         {
-            g.DrawImage(padImage, pad.location.X, pad.location.Y);
+            g.DrawImage(padImages[pad.numSprite], pad.location.X, pad.location.Y);
+            pad.timeSprite++;
+            if (pad.timeSprite >= pad.maxTimeSprites)
+            {
+                pad.timeSprite = 0;
+                pad.numSprite++;
+                if (pad.numSprite >= pad.maxSprites)
+                {
+                    pad.numSprite = 0;
+                }
+            }
         }
 
         private void DrawBall(Graphics g)
@@ -183,18 +211,7 @@ namespace WinBreakBricks
         {
             foreach (Brick brick in scenary.bricks)
             {
-                switch (brick.color)
-                {
-                    case ColorBrick.Blue:
-                        g.DrawImage(brickBlueImage, brick.location.X, brick.location.Y);
-                        break;
-                    case ColorBrick.Green:
-                        g.DrawImage(brickGreenImage, brick.location.X, brick.location.Y);
-                        break;
-                    case ColorBrick.Purple:
-                        g.DrawImage(brickPurpleImage, brick.location.X, brick.location.Y);
-                        break;
-                }
+                g.DrawImage(brickImages[(int)brick.color], brick.location.X, brick.location.Y);
             }
         }
 
@@ -214,7 +231,35 @@ namespace WinBreakBricks
 
                 // Draw "Game Over" in big red letters
                 g.DrawString("Game Over", font, brush, x, y);
+
+                timer.Enabled = false;
+                btnRestart.Visible = true;
             }
+
+            // Draw the game over if you won
+            if (scenary.win)
+            {
+                // Set the font and brush for drawing "Game Over"
+                Font font = new Font("Arial", 40, FontStyle.Bold);
+                Brush brush = new SolidBrush(Color.Green);
+
+                // Measure the size of the text to center it on the screen
+                SizeF textSize = g.MeasureString("Win!!!", font);
+                float x = (pcbGraphics.Width - textSize.Width) / 2;
+                float y = (pcbGraphics.Height - textSize.Height) / 2;
+
+                // Draw "Game Over" in big red letters
+                g.DrawString("Win!!!", font, brush, x, y);
+
+                timer.Enabled = false;
+                btnNext.Visible = true;
+            }
+        }
+
+        private void DrawLabels()
+        {
+            lblScore.Text = scenary.score.ToString();
+            lblStage.Text = scenary.stage.ToString();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -232,6 +277,27 @@ namespace WinBreakBricks
             }
             // Set focus to the form again to ensure continued keyboard input
             this.Focus();
+        }
+
+        private void btnRestart_Click(object sender, EventArgs e)
+        {
+            scenary.stage = 1;
+            scenary.score = 0;
+            scenary.Initialize(brickSize);
+            InitializeBallPad();
+
+            timer.Enabled = true;
+            btnRestart.Visible = false;
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+            scenary.stage++;
+            scenary.Initialize(brickSize);
+            InitializeBallPad();
+
+            timer.Enabled = true;
+            btnNext.Visible = false;
         }
     }
 }

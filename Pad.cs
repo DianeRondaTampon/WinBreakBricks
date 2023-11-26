@@ -10,7 +10,11 @@ namespace WinBreakBricks
     {
         public Point location { get; set; }
         public Point size { get; set; }
-        private decimal speed = (decimal)10.0;
+        public decimal speed = (decimal)20.0;
+        public int numSprite = 0;
+        public int timeSprite = 0;
+        public int maxSprites = 3;
+        public int maxTimeSprites = 10;
 
         public Pad(Point location, Point size) 
         { 
